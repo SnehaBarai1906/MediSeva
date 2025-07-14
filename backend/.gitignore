@@ -1,0 +1,32 @@
+# Global
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+
+# IDEs
+.vscode/
+.idea/
+
+# OS junk
+.env
+
+# Node
+node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Frontend specific
+frontend/node_modules/
+frontend/.env
+frontend/dist/
+frontend/build/
+
+# Backend specific
+backend/node_modules/
+backend/.env
+backend/dist/
+backend/build/

@@ -64,18 +64,27 @@ const addDoctor = async (req, res) => {
 const loginAdmin = async (req, res) => {
   try { 
     const { email, password } = req.body;
-    //checking for all data 
-    if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
-      const token = jwt.sign(email+password , process.env.JWT_SECRET)
-      res.json({success:true, message: 'Login successful', token });
-    }else{
-      return res.status(400).json({success:false, message: 'Invalid email or password' });
+
+    console.log("Login Request =>", email, password); 
+    console.log("Expected =>", process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD);
+
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '2h' });
+
+      return res.json({ success: true, message: 'Login successful', token });
+    } else {
+      return res.status(400).json({ success: false, message: 'Invalid email or password' });
     }
   }
   catch (error) {
-    console.error('❌ Server Error:', error);  // Show full stack trace
+    console.error('❌ Server Error:', error);  
     res.status(500).json({ message: 'Server error' });
   }
 }
+
 
 export { addDoctor,loginAdmin };

@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { AdminContext } from '../../context/AdminContext';
 
 const DoctorsList = () => {
-  const { doctors, aToken, getAllDoctors } = useContext(AdminContext);
+  const { doctors, aToken, getAllDoctors,changeAvailability } = useContext(AdminContext);
 
   useEffect(() => {
     if (aToken) {
@@ -39,11 +39,9 @@ const DoctorsList = () => {
                   type="checkbox"
                   checked={item.available}
                   className="w-5 h-5 rounded border-gray-300 focus:ring-purple-500"
-                  readOnly
+                  onChange={() => changeAvailability(item._id)}
                 />
-                <span className="text-sm font-medium text-gray-700">
-                  {item.available ? 'Available' : 'Unavailable'}
-                </span>
+                
               </div>
             </div>
           </div>

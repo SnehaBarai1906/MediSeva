@@ -1,5 +1,6 @@
+import doctorModel from "../models/doctor.model.js";
 
-import doctorModel from "../models/doctor.model";
+
 
 const changeAvailability = async (req, res) => {
   try {

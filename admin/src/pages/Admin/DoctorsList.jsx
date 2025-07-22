@@ -11,16 +11,16 @@ const DoctorsList = () => {
   }, [aToken]);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="flex-1 overflow-y-auto p-8 bg-gray-60 h-[calc(100vh-4rem)]">
       <h1 className="text-4xl font-bold text-center text-purple-800 mb-12">Doctors Directory</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {doctors.map((item, index) => (
           <div
             key={index}
             className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 flex flex-col hover:shadow-xl transition-shadow min-h-[350px]"
           >
-            <div className="w-full h-52 mb-4">
+            <div className="w-full h-65 mb-4">
               <img
                 src={item.image}
                 alt={item.name}
@@ -37,7 +37,9 @@ const DoctorsList = () => {
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={item.available}                  className="w-5 h-5 rounded border-gray-300 focus:ring-purple-500"
+                  checked={item.available}
+                  className="w-5 h-5 rounded border-gray-300 focus:ring-purple-500"
+                  readOnly
                 />
                 <span className="text-sm font-medium text-gray-700">
                   {item.available ? 'Available' : 'Unavailable'}

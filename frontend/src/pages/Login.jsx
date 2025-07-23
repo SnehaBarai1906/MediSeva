@@ -1,39 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../context/AppContext.jsx';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
 
 const Login = () => {
+  const { backendUrl, token, setToken } = useContext(AppContext);
   const [state, setState] = useState('Sign Up');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const onSubmitHandler = (e) => {
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
     try {
       if (state === 'Sign Up') {
-        alert('Account created (mock)');
+        const { data } = await axios.post(backendUrl + '/api/user/register', {
+          name,
+          password,
+          email,
+        });
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('token', data.token);
+          // toast.success("Account created successfully");
+          // navigate('/');
+        } else {
+          toast.error(data.message);
+        }
       } else {
-        alert('Login successful (mock)');
+        const { data } = await axios.post(backendUrl + '/api/user/login', {
+          email,
+          password,
+        });
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('token', data.token);
+          // toast.success("Login successful");
+          // navigate('/');
+        } else {
+          toast.error(data.message);
+        }
       }
-      navigate('/');
     } catch (err) {
-      setError('Something went wrong!');
+      toast.error(err.message);
+      console.error(err);
     }
-
-    setLoading(false);
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  },[token])
 
   return (
     <form
       onSubmit={onSubmitHandler}
-      className="min-h-screen flex items-center justify-center bg-gray-100 px-4"
+      className="min-h-screen flex items-center justify-center bg-white px-4"
     >
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-5">
         <p className="text-2xl font-bold text-center text-gray-800">
@@ -42,12 +69,6 @@ const Login = () => {
         <p className="text-sm text-center text-gray-600">
           Please {state === 'Sign Up' ? 'sign up' : 'login'} to book appointment
         </p>
-
-        {error && (
-          <p className="text-sm text-center text-red-600 bg-red-100 p-2 rounded">
-            {error}
-          </p>
-        )}
 
         {state === 'Sign Up' && (
           <div>
@@ -86,12 +107,9 @@ const Login = () => {
 
         <button
           type="submit"
-          className={`w-full text-white py-2 rounded-lg transition ${
-            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
-          }`}
-          disabled={loading}
+          className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition duration-300"
         >
-          {loading ? 'Please wait...' : state === 'Sign Up' ? 'Create Account' : 'Login'}
+          {state === 'Sign Up' ? 'Create Account' : 'Login'}
         </button>
 
         {state === 'Sign Up' ? (

@@ -6,13 +6,12 @@ import { AppContext } from '../context/AppContext';
 const Navbar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
-  const { user } = useContext(AppContext);
-
-  const handleLogout = async () => {
-    // If you're using firebase:
-    // await signOut(auth);
-    navigate('/');
-  };
+  const { token,setToken } = useContext(AppContext);
+  const logout = () => {
+    setToken(false)
+    localStorage.removeItem('token');
+  }
+ 
 
   return (
     <div className='relative'>
@@ -24,13 +23,13 @@ const Navbar = () => {
 
         <ul className='hidden md:flex items-start gap-5 font-medium'>
           <NavLink to='/'><li className='py-1'>HOME<hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden'/></li></NavLink>
-          <NavLink to='/doctors'><li className='py-1'>DOCTORS<hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden'/></li></NavLink>
+          <NavLink to='/doctor'><li className='py-1'>DOCTORS<hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden'/></li></NavLink>
           <NavLink to='/about'><li className='py-1'>ABOUT<hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden'/></li></NavLink>
           <NavLink to='/contact'><li className='py-1'>CONTACT<hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden'/></li></NavLink>
         </ul>
 
         <div className='flex items-center gap-4'>
-          {user ? (
+          {token ? (
             <div className='flex items-center gap-2 cursor-pointer group relative'>
               <img className='w-8 rounded-full' src={assets.profile_pic} alt="Profile" />
               <img className='w-2.5' src={assets.dropdown_icon} alt="Dropdown" />
@@ -38,7 +37,7 @@ const Navbar = () => {
                 <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
                   <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>My profile</p>
                   <p onClick={() => navigate('/my-appointments')} className='hover:text-black cursor-pointer'>Appointments</p>
-                  <p onClick={handleLogout} className='hover:text-black cursor-pointer'>Logout</p>
+                  <p onClick={logout} className='hover:text-black cursor-pointer'>Logout</p>
                 </div>
               </div>
             </div>
@@ -62,23 +61,24 @@ const Navbar = () => {
       </div>
 
       {/* ---------- Mobile Menu ---------- */}
-      <div className={`${showMenu ? 'fixed w-full' : 'h-0 w-0'} md:hidden right-0 top-0 bottom-0 z-50 bg-white`}>
-        <div className="flex items-center justify-between px-5 py-6">
-          <img className="w-36" src={assets.logo} alt="Logo" />
+      {/* ---------- Mobile Menu ---------- */}
+      <div className={`fixed top-0 right-0 w-full h-full bg-white z-50 transition-transform duration-300 ease-in-out md:hidden ${showMenu ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex items-center justify-between px-5 py-6 border-b">
+          <div onClick={() => navigate('/')} className="text-2xl font-bold text-primary">MediSeva</div>
           <img
-            className="w-6"
+            className="w-6 cursor-pointer"
             onClick={() => setShowMenu(false)}
             src={assets.cross_icon}
             alt="Close"
           />
         </div>
 
-        <ul className='px-5 text-gray-700 font-medium text-base space-y-4'>
+        <ul className='px-5 text-gray-700 font-medium text-base space-y-6 mt-6'>
           <li><NavLink to="/" onClick={() => setShowMenu(false)}>HOME</NavLink></li>
-          <li><NavLink to="/doctors" onClick={() => setShowMenu(false)}>DOCTORS</NavLink></li>
+          <li><NavLink to="/doctor" onClick={() => setShowMenu(false)}>DOCTORS</NavLink></li>
           <li><NavLink to="/about" onClick={() => setShowMenu(false)}>ABOUT</NavLink></li>
           <li><NavLink to="/contact" onClick={() => setShowMenu(false)}>CONTACT</NavLink></li>
-          {!user && (
+          {!token && (
             <li>
               <button
                 onClick={() => {
@@ -93,6 +93,7 @@ const Navbar = () => {
           )}
         </ul>
       </div>
+
     </div>
   );
 };

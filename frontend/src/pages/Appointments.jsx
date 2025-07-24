@@ -1,12 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const Appointments = () => {
   const { docId } = useParams();
-  const { doctors, currencysymbol } = useContext(AppContext); // ❌ removed setBookedAppointment
+  const { doctors, currencysymbol,backendUrl,token,getDoctorsdata } = useContext(AppContext); // ❌ removed setBookedAppointment
 
+
+  const navigate=useNavigate()
   const [docInfo, setDocInfo] = useState(null);
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
@@ -14,36 +18,78 @@ const Appointments = () => {
 
   const daysofWeek = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT'];
 
+  const bookedAppointment=async()=>{
+    if(!token){
+      toast.warn('Login to book appointmrent')
+      return navigate('/login')
+    }
+
+    try {
+      const date=docSlots[slotIndex][0].datetime
+
+      let day=date.getDate();
+      let month=date.getMonth()+1;
+      let year=date.getFullYear()
+
+      const slotDate=day+ "-"+month+"-"+year
+      const {data}=await axios.post(backendUrl+'/api/user/book-appointment',{docId,slotDate,slotTime},{ headers: {
+          Authorization: `Bearer ${token}`
+        }})
+
+        if(data.success){
+          toast.success(data.message)
+          getDoctorsdata()
+          navigate('/my-appointments')
+        }else{
+          toast.error(data.message)
+        }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+    }
+  }
+
   useEffect(() => {
     const doc = doctors.find(doc => doc._id === docId);
     setDocInfo(doc);
   }, [docId, doctors]);
 
-  useEffect(() => {
-    if (!docInfo) return;
+useEffect(() => {
+  if (!docInfo) return;
 
-    const slots = [];
+  const bookedSlots = docInfo.slots_booked || {}; // contains dates with time arrays
+  const slots = [];
 
-    for (let i = 0; i < 7; i++) {
-      let date = new Date();
-      date.setDate(date.getDate() + i);
-      let daySlots = [];
+  for (let i = 0; i < 7; i++) {
+    let date = new Date();
+    date.setDate(date.getDate() + i);
+    let daySlots = [];
 
-      let start = new Date(date.setHours(10, 0, 0, 0));
-      let end = new Date(date.setHours(21, 0, 0, 0));
+    let start = new Date(date.setHours(10, 0, 0, 0));
+    let end = new Date(date.setHours(21, 0, 0, 0));
 
-      for (let d = new Date(start); d < end; d.setMinutes(d.getMinutes() + 30)) {
+    for (let d = new Date(start); d < end; d.setMinutes(d.getMinutes() + 30)) {
+      const slotDateKey = `${d.getDate()}-${d.getMonth() + 1}-${d.getFullYear()}`;
+      const slotTimeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Only include slot if it's not already booked
+      if (
+        !bookedSlots[slotDateKey] ||
+        !bookedSlots[slotDateKey].includes(slotTimeStr)
+      ) {
         daySlots.push({
           datetime: new Date(d),
-          time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          time: slotTimeStr,
         });
       }
-
-      slots.push(daySlots);
     }
 
-    setDocSlots(slots);
-  }, [docInfo]);
+    slots.push(daySlots);
+  }
+
+  setDocSlots(slots);
+}, [docInfo]);
+
 
   if (!docInfo) return null;
 
@@ -124,10 +170,10 @@ const Appointments = () => {
 
             <button
               className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-full font-medium text-sm transition"
-              onClick={() => {
-                if (!slotTime) return alert("Please select a time slot");
-                alert("This is a demo. Booking is disabled.");
-              }}
+              onClick={
+                //if (!slotTime) return alert("Please select a time slot");
+                bookedAppointment
+              }
             >
               Book an appointment
             </button>

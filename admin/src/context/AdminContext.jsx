@@ -9,12 +9,8 @@ const AdminContextProvider = (props) => {
   const [aToken,setAToken] = useState(localStorage.getItem('aToken')? localStorage.getItem('aToken') : '');
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [doctors, setDoctors] = useState([]); // State to hold doctors list
-  // useEffect(() => {
-  //   const token = localStorage.getItem('aToken');
-  //   if (token) {
-  //     setAToken(token);
-  //   }
-  // }, []);
+
+  const[appointments,setAppointments]=useState([])
 
   const getAllDoctors = async () => {
   try {
@@ -65,13 +61,63 @@ const changeAvailability = async (docId) => {
   }
 }
 
+const getAllAppointments = async () => {
+  try {
+    const { data } = await axios.get(
+      `${backendUrl}/api/admin/appointments`,
+      {
+        headers: {
+          Authorization: `Bearer ${aToken}`,
+        },
+      }
+    );
+
+    if (data.success) {
+      setAppointments(data.appointments);
+      console.log("Appointments fetched successfully:", data.appointments);
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    toast.error(error.message);
+  }
+}
+
+const cancelAppointment = async (appointmentId) => {
+  try {
+    const { data } = await axios.post(
+      `${backendUrl}/api/admin/cancel-appointment`,
+      { appointmentId },
+      {
+        headers: {
+          Authorization: `Bearer ${aToken}`,
+        },
+      }
+    );
+
+    if (data.success) {
+      toast.success(data.message);
+      getAllAppointments(); // Refresh appointments after cancellation
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error('Error cancelling appointment:', error);
+    toast.error(error.message);
+  }
+}
+
+
   const value={
     aToken,
     setAToken,
     backendUrl,
     doctors,
     getAllDoctors,
-    changeAvailability
+    changeAvailability,setAppointments,appointments,
+    getAllAppointments,
+    cancelAppointment
   }
 
   

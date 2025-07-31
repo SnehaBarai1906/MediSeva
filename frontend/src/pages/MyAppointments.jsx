@@ -30,6 +30,37 @@ const MyAppointments = () => {
     }
   };
 
+  const initPay = async (order) => {
+
+    const options = {
+       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "MediSeva",
+      description: "Appointment Payment",
+      order_id: order.id,
+      receipt:order.receipt,
+      handler: async (response) => {
+        console.log(response);
+      }
+    }
+    const rzp=new window.Razorpay(options);
+    rzp.open();
+
+  }
+
+  const appointmentRazorpay = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/user/payment-razorpay`, 
+        { appointmentId }, {headers: { Authorization: `Bearer ${token}` }});
+        if (data.success) {
+          initPay(data.order);
+        }
+    } catch (error) {
+      
+    }
+  } 
+
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(`${backendUrl}/api/user/cancel-appointment`, { appointmentId }, {
@@ -96,6 +127,8 @@ const MyAppointments = () => {
                   </button>
 
                   <button
+                  onClick={() => appointmentRazorpay(item._id)}
+
                     className="bg-white border border-zinc-300 text-zinc-700 px-4 py-2 rounded-md hover:border-zinc-600 hover:text-zinc-900 transition font-medium shadow-sm"
                   >
                     Pay Online

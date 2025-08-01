@@ -31,7 +31,7 @@ const DoctorAppointment = () => {
           </div>
 
           {/* Data Rows */}
-          {appointments.map((item, index) => (
+          {appointments.reverse().map((item, index) => (
             <div
               key={index}
               className="grid grid-cols-7 gap-4 items-center p-4 border-b hover:bg-blue-50 transition text-sm md:text-base"

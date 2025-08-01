@@ -1,9 +1,14 @@
 import express from 'express';
-import { doctorlist } from '../controllers/doctor.controller.js';
+import { doctorlist, loginDoctor,appointmentsDoctor,appointmentCancel,appointmentComplete } from '../controllers/doctor.controller.js';
+import authDoctor from '../middlewares/authDoctor.js';
 
 const doctorRouter = express.Router();
 
 
 doctorRouter.get('/list', doctorlist)
+doctorRouter.post('/login',loginDoctor)
+doctorRouter.get('/appointments', authDoctor, appointmentsDoctor);
+doctorRouter.post('/complete-appointment', authDoctor, appointmentComplete);
+doctorRouter.post('/cancel-appointment', authDoctor, appointmentCancel);
 
 export default doctorRouter;

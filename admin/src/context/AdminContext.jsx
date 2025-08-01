@@ -11,6 +11,7 @@ const AdminContextProvider = (props) => {
   const [doctors, setDoctors] = useState([]); // State to hold doctors list
 
   const[appointments,setAppointments]=useState([])
+  const[dashData,setDashData]=useState(false)
 
   const getAllDoctors = async () => {
   try {
@@ -108,6 +109,28 @@ const cancelAppointment = async (appointmentId) => {
   }
 }
 
+const getDashData = async () => {
+  try {
+    const { data } = await axios.get(
+      `${backendUrl}/api/admin/dashboard`,
+      {
+        headers: { 
+          Authorization: `Bearer ${aToken}`,
+        },
+      }
+    );
+    if(data.success) {
+      setDashData(data.dashData);
+      console.log("Dashboard data fetched successfully:", data.dashData);
+    }else{
+      toast.error(data.message);
+    }
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    toast.error('Failed to fetch dashboard data');
+  }
+}
+
 
   const value={
     aToken,
@@ -117,7 +140,9 @@ const cancelAppointment = async (appointmentId) => {
     getAllDoctors,
     changeAvailability,setAppointments,appointments,
     getAllAppointments,
-    cancelAppointment
+    cancelAppointment,
+    dashData,
+    getDashData
   }
 
   

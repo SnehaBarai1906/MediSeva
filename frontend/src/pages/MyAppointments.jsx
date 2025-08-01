@@ -122,35 +122,48 @@ const MyAppointments = () => {
             </div>
 
             <div className="flex flex-col gap-2 w-full md:w-auto">
-              {item.cancelled ? (
-                  <button className="bg-gray-200 text-red-700 px-4 py-2 rounded-md font-medium cursor-not-allowed" disabled>
-                    Appointment Cancelled
+              {item.isCompleted ? (
+                <button
+                  className="bg-green-100 text-green-700 px-4 py-2 rounded-md font-medium cursor-not-allowed"
+                  disabled
+                >
+                  Appointment Completed
+                </button>
+              ) : item.cancelled ? (
+                <button
+                  className="bg-gray-200 text-red-700 px-4 py-2 rounded-md font-medium cursor-not-allowed"
+                  disabled
+                >
+                  Appointment Cancelled
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="bg-white border border-zinc-300 text-zinc-700 px-4 py-2 rounded-md hover:border-zinc-600 hover:text-zinc-900 transition font-medium shadow-sm"
+                    onClick={() => cancelAppointment(item._id)}
+                  >
+                    Cancel Appointment
                   </button>
-                ) : (
-                  <>
+
+                  {item.payment ? (
                     <button
-                      className="bg-white border border-zinc-300 text-zinc-700 px-4 py-2 rounded-md hover:border-zinc-600 hover:text-zinc-900 transition font-medium shadow-sm"
-                      onClick={() => cancelAppointment(item._id)}
+                      className="bg-green-100 text-green-700 px-4 py-2 rounded-md font-semibold cursor-not-allowed"
+                      disabled
                     >
-                      Cancel Appointment
+                      Paid
                     </button>
-
-                    {item.payment ? (
-                      <button className="bg-green-100 text-green-700 px-4 py-2 rounded-md font-semibold cursor-not-allowed" disabled>
-                        Paid
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => appointmentRazorpay(item._id)}
-                        className="bg-white border border-zinc-300 text-zinc-700 px-4 py-2 rounded-md hover:border-zinc-600 hover:text-zinc-900 transition font-medium shadow-sm"
-                      >
-                        Pay Online
-                      </button>
-                    )}
-                  </>
-                )}
-
+                  ) : (
+                    <button
+                      onClick={() => appointmentRazorpay(item._id)}
+                      className="bg-white border border-zinc-300 text-zinc-700 px-4 py-2 rounded-md hover:border-zinc-600 hover:text-zinc-900 transition font-medium shadow-sm"
+                    >
+                      Pay Online
+                    </button>
+                  )}
+                </>
+              )}
             </div>
+
           </div>
         ))}
       </div>

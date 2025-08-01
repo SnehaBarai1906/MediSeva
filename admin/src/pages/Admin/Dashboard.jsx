@@ -92,12 +92,14 @@ const Dashboard = () => {
                 <div className="mt-3 md:mt-0">
                   {item.cancelled ? (
                     <p className="text-red-500 font-medium">Cancelled</p>
-                  ) : (
+                  ) :item.isCompleted
+                  ?<p className="green-red-500 font-medium">Completed</p>
+                  : (
                     <img
                       onClick={() => cancelAppointment(item._id)}
                       src={assets.cancel_icon}
                       alt="Cancel"
-                      className="w-10 h-10 cursor-pointer hover:scale-110 transition"
+                      className="w-6 h-6 cursor-pointer hover:scale-110 transition"
                     />
                   )}
                 </div>
